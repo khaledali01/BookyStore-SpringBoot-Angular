@@ -1,1 +1,19 @@
-<p>product-list works!</p>
+<div class="main-content">
+  <div class="section-content section-content-p30">
+    <div class="container-fluid">
+      <div class="row">
+        <!-- loop -->
+        <div *ngFor="let product of products" class="col-md-3">
+          <div class="product-box">
+            <img [src]="product.imageUrl" class="image-responsive" />
+            <h1>{{ product.name }}</h1>
+            <div class="price">
+              {{ product.unitPrice | currency : "USD" }}
+            </div>
+            <a href="#" class="primary-btn">Add to cart</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
