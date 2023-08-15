@@ -13,6 +13,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CartStatusComponent } from './components/cart-status/cart-status.component';
 import { CartDetailsComponent } from './components/cart-details/cart-details.component';
 import { CartService } from './services/cart.service';
+import { CheckoutComponent } from './components/checkout/checkout.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ShopValidators } from './validators/shop-validators';
 
 @NgModule({
   declarations: [
@@ -23,12 +26,15 @@ import { CartService } from './services/cart.service';
     ProductDetailsComponent,
     CartStatusComponent,
     CartDetailsComponent,
+    CheckoutComponent,
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
-    NgbModule
+    NgbModule,
+    ReactiveFormsModule,
+    FormsModule,
   ],
   providers: [
     ProductService,

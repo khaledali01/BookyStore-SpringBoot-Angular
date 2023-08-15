@@ -6,19 +6,24 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "product")
 public class Product {
 
+    @Column(name = "id", nullable = false)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
     @JoinColumn(name = "category_id")
     private ProductCategory category;
+    @Column(name = "sku", nullable = false)
     private String sku;
+    @Column(name = "name", nullable = false)
     private String name;
+    @Column(name = "description")
     private String description;
     @Column(name = "unit_price")
     private BigDecimal unitPrice;
@@ -147,5 +152,17 @@ public class Product {
 
     public void setLastUpdated(Date lastUpdated) {
         this.lastUpdated = lastUpdated;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Product product)) return false;
+        return Objects.equals(id, product.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
