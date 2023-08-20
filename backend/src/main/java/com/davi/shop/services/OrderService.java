@@ -1,9 +1,10 @@
 package com.davi.shop.services;
 
-import com.davi.shop.dto.OrderDTO;
-import com.davi.shop.entities.Order;
+import com.davi.shop.dto.controller.OrderDTO;
+import com.davi.shop.entities.order.Order;
 import com.davi.shop.repositories.OrderRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Objects;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -11,12 +12,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrderService {
 
-    @Autowired
-    private OrderRepository repository;
+    private final OrderRepository repository;
 
-    public Page<OrderDTO> findByEmail(String email, Pageable pageable) {
-        Page<Order> orders = repository.findByCustomerEmailOrderByDateCreatedDesc(email, pageable);
-        Page<OrderDTO> dto = orders.map(x -> new OrderDTO(x));
-        return dto;
+    public OrderService(final OrderRepository repository) {
+	this.repository = Objects.requireNonNull(repository);
+    }
+
+    public Page<OrderDTO> findByEmail(String email,
+	    Pageable pageable) {
+
+	Page<Order> orders = repository
+		.findByUserEmailOrderByDateCreatedDesc(email,
+			pageable);
+	return orders.map(OrderDTO::new);
     }
 }

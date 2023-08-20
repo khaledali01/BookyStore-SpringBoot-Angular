@@ -4,6 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgxSpinnerModule } from "ngx-spinner";
 import { AppComponent } from './app.component';
 import { CartDetailsComponent } from './components/cart-details/cart-details.component';
 import { CartStatusComponent } from './components/cart-status/cart-status.component';
@@ -17,25 +18,16 @@ import { SearchComponent } from './components/search/search.component';
 import { CartService } from './services/cart.service';
 import { ProductService } from './services/product.service';
 
-import {
-  OktaAuthModule,
-  OktaCallbackComponent,
-  OKTA_CONFIG
-} from '@okta/okta-angular';
 
-import { OktaAuth } from '@okta/okta-auth-js';
 
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RouterModule } from '@angular/router';
 import { AppRoutingModule } from './app-routing.module';
 import { MembersPageComponent } from './components/members-page/members-page.component';
 import { OrderHistoryComponent } from './components/order-history/order-history.component';
-import myAppConfig from './config/my-app-config';
-import { AuthInterceptorService } from './services/auth-interceptor.service';
-
-
-const oktaConfig = myAppConfig.oidc;
-const oktaAuth = new OktaAuth(oktaConfig);
-
+import { LoadingInterceptor } from './interceptor/loading.interceptor';
+import { AuthInterceptorService } from './services/authentication/auth-interceptor.service';
+import { AdminAreaComponent } from './components/admin-area/admin-area.component';
 
 @NgModule({
   declarations: [
@@ -50,25 +42,26 @@ const oktaAuth = new OktaAuth(oktaConfig);
     LoginComponent,
     LoginStatusComponent,
     MembersPageComponent,
-    OrderHistoryComponent
+    OrderHistoryComponent,
+    AdminAreaComponent
   ],
   imports: [
     BrowserModule,
     NgbModule,
     ReactiveFormsModule,
     FormsModule,
-    OktaAuthModule,
     RouterModule,
     HttpClientModule,
-    AppRoutingModule
+    AppRoutingModule,
+    NgxSpinnerModule.forRoot({ type: 'ball-spin' }),
+    BrowserAnimationsModule,
   ],
   providers: [
     ProductService,
     CartService,
-    OktaCallbackComponent,
     provideHttpClient(),
-    { provide: OKTA_CONFIG, useValue: { oktaAuth } },
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptorService, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptorService, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })
