@@ -1,179 +1,170 @@
 package com.davi.shop.entities.product;
 
-import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 
-@Entity
-@Table(name = "products")
+import com.davi.shop.entities.productcat.ProductCategory;
+import com.davi.shop.exceptions.NotificationException;
+import com.davi.shop.utils.InstantUtils;
+import com.davi.shop.validation.Notification;
+import com.davi.shop.validation.ValidationHandler;
+
 public class Product {
 
-    @Column(name = "id", nullable = false)
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @ManyToOne
-    @JoinColumn(name = "category_id")
+
     private ProductCategory category;
-    
-    @Column(name = "sku", nullable = false)
+
     private String sku;
-    
-    @Column(name = "name", nullable = false)
+
     private String name;
-    
-    @Column(name = "description")
+
     private String description;
-    
-    @Column(name = "unit_price")
+
     private BigDecimal unitPrice;
-    
-    @Column(name = "image_url")
+
     private String imageUrl;
-    
-    @Column(name = "active")
+
     private Boolean active;
-    
-    @Column(name = "units_in_stock")
+
     private Integer unitsInStock;
-    
-    @CreationTimestamp
-    @Column(name = "date_created")
+
     private Date dateCreated;
-    
-    @UpdateTimestamp
-    @Column(name = "last_updated")
+
     private Date lastUpdated;
 
+    private Product(Long id, ProductCategory category, String sku,
+	    String name, String description, BigDecimal unitPrice,
+	    String imageUrl, Boolean active, Integer unitsInStock,
+	    Date dateCreated, Date lastUpdated) {
+	this.id = id;
+	this.category = category;
+	this.sku = sku;
+	this.name = name;
+	this.description = description;
+	this.unitPrice = unitPrice;
+	this.imageUrl = imageUrl;
+	this.active = active;
+	this.unitsInStock = unitsInStock;
+	this.dateCreated = dateCreated;
+	this.lastUpdated = lastUpdated;
 
-    public Product() {
+	selfValidate();
     }
 
-    public Product(Long id, ProductCategory category, String sku, String name, String description, BigDecimal unitPrice, String imageUrl, Boolean active, Integer unitsInStock, Date dateCreated, Date lastUpdated) {
-        this.id = id;
-        this.category = category;
-        this.sku = sku;
-        this.name = name;
-        this.description = description;
-        this.unitPrice = unitPrice;
-        this.imageUrl = imageUrl;
-        this.active = active;
-        this.unitsInStock = unitsInStock;
-        this.dateCreated = dateCreated;
-        this.lastUpdated = lastUpdated;
+    public Product update(ProductCategory category, String sku,
+	    String name, String description, BigDecimal unitPrice,
+	    String imageUrl, Boolean active, Integer unitsInStock) {
+
+	this.category = category;
+	this.sku = sku;
+	this.name = name;
+	this.description = description;
+	this.unitPrice = unitPrice;
+	this.imageUrl = imageUrl;
+	this.active = active;
+	this.unitsInStock = unitsInStock;
+	this.lastUpdated = Date.from(InstantUtils.now());
+
+	selfValidate();
+	
+	return this;
     }
 
+    public static Product create(ProductCategory category, String sku,
+	    String name, String description, BigDecimal unitPrice,
+	    String imageUrl, Boolean active, Integer unitsInStock) {
+	return new Product(null, category, sku, name, description,
+		unitPrice, imageUrl, active, unitsInStock,
+		InstantUtils.dateNow(), InstantUtils.dateNow());
+    }
+
+    public static Product with(Long id, ProductCategory category,
+	    String sku, String name, String description,
+	    BigDecimal unitPrice, String imageUrl, Boolean active,
+	    Integer unitsInStock, Date dateCreated,
+	    Date lastUpdated) {
+	return new Product(id, category, sku, name, description,
+		unitPrice, imageUrl, active, unitsInStock,
+		dateCreated, lastUpdated);
+    }
+
+    public void validate(ValidationHandler handler) {
+	new ProductValidator(this, handler).validate();
+    }
+    
+    private void selfValidate() {
+	final var notification = Notification.create();
+	validate(notification);
+
+	if (notification.hasError()) {
+	    throw new NotificationException(
+		    "Failed to validate Aggregate FixedTax",
+		    notification);
+	}	
+    }    
+    
+    public Long getId() {
+	return id;
+    }
 
     public ProductCategory getCategory() {
-        return category;
-    }
-
-    public void setCategory(ProductCategory category) {
-        this.category = category;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+	return category;
     }
 
     public String getSku() {
-        return sku;
-    }
-
-    public void setSku(String sku) {
-        this.sku = sku;
+	return sku;
     }
 
     public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+	return name;
     }
 
     public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+	return description;
     }
 
     public BigDecimal getUnitPrice() {
-        return unitPrice;
-    }
-
-    public void setUnitPrice(BigDecimal unitPrice) {
-        this.unitPrice = unitPrice;
+	return unitPrice;
     }
 
     public String getImageUrl() {
-        return imageUrl;
+	return imageUrl;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
+    public Boolean getActive() {
+	return active;
     }
 
     public Integer getUnitsInStock() {
-        return unitsInStock;
-    }
-
-    public void setUnitsInStock(Integer unitsInStock) {
-        this.unitsInStock = unitsInStock;
+	return unitsInStock;
     }
 
     public Date getDateCreated() {
-        return dateCreated;
-    }
-
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
+	return dateCreated;
     }
 
     public Date getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public void setLastUpdated(Date lastUpdated) {
-        this.lastUpdated = lastUpdated;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Product product)) return false;
-        return Objects.equals(id, product.id);
+	return lastUpdated;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+	return Objects.hash(id, name);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj)
+	    return true;
+	if (obj == null)
+	    return false;
+	if (getClass() != obj.getClass())
+	    return false;
+	Product other = (Product) obj;
+	return Objects.equals(id, other.id)
+		&& Objects.equals(name, other.name);
+    }
+
 }
