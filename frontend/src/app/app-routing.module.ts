@@ -1,11 +1,12 @@
 import { Injector, NgModule } from '@angular/core';
-import { Router, RouterModule, Routes } from '@angular/router';
+import { provideRouter, Router, RouterModule, Routes } from '@angular/router';
 import { OktaAuthGuard, OktaCallbackComponent } from '@okta/okta-angular';
 import { OktaAuth } from '@okta/okta-auth-js';
 import { CartDetailsComponent } from './components/cart-details/cart-details.component';
 import { CheckoutComponent } from './components/checkout/checkout.component';
 import { LoginComponent } from './components/login/login.component';
 import { MembersPageComponent } from './components/members-page/members-page.component';
+import { OrderHistoryComponent } from './components/order-history/order-history.component';
 import { ProductDetailsComponent } from './components/product-details/product-details.component';
 import { ProductListComponent } from './components/product-list/product-list.component';
 
@@ -19,6 +20,12 @@ function sendToLoginPage(oktaAuth:OktaAuth,injector:Injector){
 
 
 const routes: Routes = [
+  {
+    path: 'order-history',
+    canActivate: [OktaAuthGuard],
+    component: OrderHistoryComponent,
+    data: {onAuthRequired: sendToLoginPage}
+  },
   {
     path: 'members',
     canActivate: [OktaAuthGuard],
@@ -39,7 +46,8 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  imports: [],
+  exports: [RouterModule],
+  providers:[provideRouter(routes)]
 })
 export class AppRoutingModule { }

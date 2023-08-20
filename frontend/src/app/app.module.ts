@@ -1,10 +1,9 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CartDetailsComponent } from './components/cart-details/cart-details.component';
 import { CartStatusComponent } from './components/cart-status/cart-status.component';
@@ -26,8 +25,13 @@ import {
 
 import { OktaAuth } from '@okta/okta-auth-js';
 
-import myAppConfig from './config/my-app-config';
+import { RouterModule } from '@angular/router';
+import { AppRoutingModule } from './app-routing.module';
 import { MembersPageComponent } from './components/members-page/members-page.component';
+import { OrderHistoryComponent } from './components/order-history/order-history.component';
+import myAppConfig from './config/my-app-config';
+import { AuthInterceptorService } from './services/auth-interceptor.service';
+
 
 const oktaConfig = myAppConfig.oidc;
 const oktaAuth = new OktaAuth(oktaConfig);
@@ -45,22 +49,26 @@ const oktaAuth = new OktaAuth(oktaConfig);
     CheckoutComponent,
     LoginComponent,
     LoginStatusComponent,
-    MembersPageComponent
+    MembersPageComponent,
+    OrderHistoryComponent
   ],
   imports: [
     BrowserModule,
-    HttpClientModule,
-    AppRoutingModule,
     NgbModule,
     ReactiveFormsModule,
     FormsModule,
-    OktaAuthModule
+    OktaAuthModule,
+    RouterModule,
+    HttpClientModule,
+    AppRoutingModule
   ],
   providers: [
     ProductService,
     CartService,
     OktaCallbackComponent,
-    { provide: OKTA_CONFIG, useValue: { oktaAuth } }
+    provideHttpClient(),
+    { provide: OKTA_CONFIG, useValue: { oktaAuth } },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptorService, multi: true }
   ],
   bootstrap: [AppComponent]
 })
